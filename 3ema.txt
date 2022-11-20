@@ -1,0 +1,54 @@
+//@author SoftKill21 modify by Vita-B12
+//@version=5
+
+strategy(title             = "3EMA stupidbot backtest",
+         shorttitle        = "3EMA stupidbot backtest",
+         overlay           = true,
+         initial_capital   = 100,
+         currency = currency.USD,
+         pyramiding = 1,
+         commission_type=strategy.commission.percent,
+         commission_value=0.04,//Binance fee 2022, Taker rate.
+         slippage=2,
+         precision=6,
+         default_qty_value=1)
+Description ='เงินเริ่มต้น 100USD เล่น 1% ของพอร์ต >> แก้ตรง Properties'
+//Input
+src = input(close, title='Source', group=Description)
+len2enable = input(true, title='Use Middle MA', group=Description)
+len1 = input.int(20, minval=1, title='fast MA', group=Description)
+len2 = input.int(34, minval=1, title='mid MA', group=Description)
+len3 = input.int(200, minval=1, title='slow MA', group=Description)
+tp_l = input(50, title='TP-Long')
+sl_l = input(100, title='SL-Long')
+tp_s = input(50, title='TP-Short')
+sl_s = input(100, title='SL-Short')
+//Variables
+fastma = ta.ema(src, len1)
+midma = ta.ema(src, len2)
+slowma = ta.sma(src, len3)
+//Strategy
+longCondition = ta.crossover(fastma, slowma)
+shortCondition = ta.crossunder(fastma, slowma)
+exit_l = ta.crossunder(fastma, midma)
+exit_s = ta.crossover(fastma, midma)
+if len2enable == true
+    if longCondition
+        strategy.entry('☝️', strategy.long)
+        strategy.exit('tp/sl', 'long', profit=tp_l, loss=sl_l)
+    if shortCondition
+        strategy.entry('👇', strategy.short)
+        strategy.exit('tp/sl', 'short', profit=tp_s, loss=sl_s)
+    if exit_l or exit_s
+        strategy.close_all('✋mid line')
+if len2enable == false
+    if longCondition
+        strategy.entry('☝️', strategy.long)
+        strategy.exit('tp/sl', 'long', profit=tp_l, loss=sl_l)
+    if shortCondition
+        strategy.entry('👇', strategy.short)
+        strategy.exit('tp/sl', 'short', profit=tp_s, loss=sl_s)
+//Plot
+plot(fastma, color=color.new(#f54545, 0), title='Fast MA')
+plot(midma, color=color.new(color.yellow, 0), title='Mid MA')
+plot(slowma, color=color.new(color.blue, 0), title='Slow MA')
