@@ -26,7 +26,7 @@ sl_s = input(100, title='SL-Short')
 //Variables
 fastma = ta.ema(src, len1)
 midma = ta.ema(src, len2)
-slowma = ta.sma(src, len3)
+slowma = ta.ema(src, len3) ////// edit SMA to EMA
 //Strategy
 longCondition = ta.crossover(fastma, slowma)
 shortCondition = ta.crossunder(fastma, slowma)
